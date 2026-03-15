@@ -1,0 +1,12 @@
+env: "local"
+log_level: "debug"
+
+http_server:
+  address: "localhost:8080"
+  idle_timeout: 120s
+  read_timeout: 2s
+  write_timeout: 2s
+
+db:
+  dsn: ""
+
