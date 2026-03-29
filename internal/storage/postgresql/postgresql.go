@@ -2,9 +2,15 @@ package postgresql
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
+	"strings"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -33,4 +39,27 @@ func New(ctx context.Context, cfg Config) (*pgxpool.Pool, error) {
 	}
 
 	return pool, nil
+}
+
+func RunMigrations(dsn string, migrationsFS fs.FS) error {
+	src, err := iofs.New(migrationsFS, ".")
+	if err != nil {
+		return fmt.Errorf("create migrations source: %w", err)
+	}
+
+	dsn = strings.TrimPrefix(dsn, "postgres://")
+	dsn = strings.TrimPrefix(dsn, "postgresql://")
+	dsn = "pgx5://" + dsn
+
+	m, err := migrate.NewWithSourceInstance("iofs", src, dsn)
+	if err != nil {
+		return fmt.Errorf("could not create migrate instance: %w", err)
+	}
+	defer m.Close()
+
+	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("failed to apply migrations: %w", err)
+	}
+
+	return nil
 }

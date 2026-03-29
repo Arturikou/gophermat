@@ -14,6 +14,11 @@ type Config struct {
 	LogLevel   string           `yaml:"log_level" env-default:"info"`
 	HTTPServer HTTPServerConfig `yaml:"http_server"`
 	DB         DBConfig         `yaml:"db"`
+	Auth       AuthConfig       `yaml:"auth"`
+}
+
+type AuthConfig struct {
+	SecretKey string `yaml:"secret_key" env:"AUTH_SECRET_KEY"`
 }
 
 type DBConfig struct {

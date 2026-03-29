@@ -10,7 +10,7 @@ func (r *Repo) WithTx(ctx context.Context, fn func(r *Repo) error) error {
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer tx.Rollback(ctx) // nolint:errcheck
 
 	if err := fn(&Repo{db: tx, pool: r.pool}); err != nil {
 		return err

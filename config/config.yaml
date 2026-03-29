@@ -8,5 +8,8 @@ http_server:
   write_timeout: 2s
 
 db:
-  dsn: ""
+  dsn: "postgres://derkachartur:root@localhost:5432/postgres?sslmode=disable"
+
+auth:
+  secret_key: "supersecretkey"
 
