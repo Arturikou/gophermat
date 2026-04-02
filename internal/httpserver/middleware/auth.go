@@ -1,18 +1,11 @@
 package middleware
 
 import (
-	"context"
-	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/Arturikou/internal/ctxkeys"
 )
-
-var ErrContextKeyNotFound = errors.New("key not found in context")
-var ErrContextValueWrongType = errors.New("context value has unexpected type")
-
-type ContextKey string
-
-const ContextKeyUserID ContextKey = "userID"
 
 type TokenManager interface {
 	GetUserID(tokenString string) (int, error)
@@ -30,22 +23,7 @@ func Auth(m TokenManager) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), ContextKeyUserID, userID)
-			next.ServeHTTP(w, r.WithContext(ctx))
+			next.ServeHTTP(w, r.WithContext(ctxkeys.SetUserID(r.Context(), userID)))
 		})
 	}
-}
-
-func UserIDFromContext(ctx context.Context) (int, error) {
-	val := ctx.Value(ContextKeyUserID)
-	if val == nil {
-		return 0, ErrContextKeyNotFound
-	}
-
-	id, ok := val.(int)
-	if !ok {
-		return 0, ErrContextValueWrongType
-	}
-
-	return id, nil
 }

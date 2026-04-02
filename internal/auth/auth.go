@@ -49,7 +49,7 @@ func (m *Manager) GetUserID(tokenString string) (int, error) {
 		})
 
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("invalid token: %w", err)
 	}
 
 	if !token.Valid {

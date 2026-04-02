@@ -53,6 +53,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
@@ -92,4 +93,5 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	w.WriteHeader(http.StatusOK)
 }
