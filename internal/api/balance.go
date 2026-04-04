@@ -14,18 +14,18 @@ import (
 
 type WithdrawReq struct {
 	OrderNumber string          `json:"order" validate:"required"`
-	Amount      decimal.Decimal `json:"sum" validate:"required, gt=0"`
+	Amount      decimal.Decimal `json:"sum"`
 }
 
 type BalanceResp struct {
-	Current   decimal.Decimal `json:"current"`
-	Withdrawn decimal.Decimal `json:"withdrawn"`
+	Current   float64 `json:"current"`
+	Withdrawn float64 `json:"withdrawn"`
 }
 
 type WithdrawalResp struct {
-	OrderNumber string          `json:"order"`
-	Amount      decimal.Decimal `json:"sum"`
-	ProcessedAt string          `json:"processed_at"`
+	OrderNumber string  `json:"order"`
+	Amount      float64 `json:"sum"`
+	ProcessedAt string  `json:"processed_at"`
 }
 
 func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
@@ -94,8 +94,8 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := BalanceResp{
-		Current:   balance.Current,
-		Withdrawn: balance.Withdrawn,
+		Current:   balance.Current.InexactFloat64(),
+		Withdrawn: balance.Withdrawn.InexactFloat64(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -130,7 +130,7 @@ func (h *Handler) GetWithdrawals(w http.ResponseWriter, r *http.Request) {
 	for _, withdrawal := range withdrawals {
 		resp = append(resp, WithdrawalResp{
 			OrderNumber: withdrawal.OrderNumber,
-			Amount:      withdrawal.Amount,
+			Amount:      withdrawal.Amount.InexactFloat64(),
 			ProcessedAt: withdrawal.ProcessedAt.Format(time.RFC3339),
 		})
 	}

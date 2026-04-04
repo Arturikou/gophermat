@@ -11,14 +11,13 @@ import (
 	"github.com/Arturikou/internal/logger"
 	"github.com/Arturikou/internal/models"
 	"github.com/Arturikou/internal/utils"
-	"github.com/shopspring/decimal"
 )
 
 type OrderResp struct {
-	Number     string           `json:"number"`
-	Status     string           `json:"status"`
-	Accrual    *decimal.Decimal `json:"accrual,omitempty"`
-	UploadedAt string           `json:"uploaded_at"`
+	Number     string   `json:"number"`
+	Status     string   `json:"status"`
+	Accrual    *float64 `json:"accrual,omitempty"`
+	UploadedAt string   `json:"uploaded_at"`
 }
 
 func (h *Handler) Orders(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +95,8 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 			UploadedAt: order.UploadedAt.Format(time.RFC3339),
 		}
 		if !order.Accrual.IsZero() {
-			resp.Accrual = &order.Accrual
+			accrual := order.Accrual.InexactFloat64()
+			resp.Accrual = &accrual
 		}
 		ordersResp = append(ordersResp, resp)
 	}
