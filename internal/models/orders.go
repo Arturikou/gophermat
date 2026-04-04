@@ -26,3 +26,10 @@ type Order struct {
 	Accrual    decimal.Decimal
 	UploadedAt time.Time
 }
+
+type OrderUpdate struct {
+	Number  string
+	UserID  int
+	Status  OrderStatus
+	Accrual decimal.Decimal
+}

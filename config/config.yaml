@@ -16,3 +16,7 @@ auth:
 accrual_system:
   address: "http://localhost:8081"
   timeout: 5s
+
+accrual_worker:
+  worker_count: 5
+  max_concurrency: 10

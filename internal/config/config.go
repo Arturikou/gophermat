@@ -16,6 +16,7 @@ type Config struct {
 	DB            DBConfig            `yaml:"db"`
 	Auth          AuthConfig          `yaml:"auth"`
 	AccrualSystem AccrualSystemConfig `yaml:"accrual_system"`
+	AccrualWorker AccrualWorkerConfig `yaml:"accrual_worker"`
 }
 
 type AuthConfig struct {
@@ -40,6 +41,11 @@ type HTTPServerConfig struct {
 type AccrualSystemConfig struct {
 	Address string        `yaml:"address" env:"ACCRUAL_SYSTEM_ADDRESS"`
 	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
+}
+
+type AccrualWorkerConfig struct {
+	WorkerCount    int `yaml:"worker_count" env-default:"5"`
+	MaxConcurrency int `yaml:"max_concurrency"    env-default:"10"`
 }
 
 func MustLoad() *Config {

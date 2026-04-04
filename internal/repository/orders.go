@@ -63,11 +63,11 @@ func (r *Repo) GetOrdersByUserID(ctx context.Context, userID int) ([]models.Orde
 	return orders, nil
 }
 
-func (r *Repo) GetOrderNumbersInStatus(ctx context.Context, status []models.OrderStatus) ([]string, error) {
+func (r *Repo) GetOrdersInStatus(ctx context.Context, status []models.OrderStatus) ([]models.OrderUpdate, error) {
 	query := `
-		SELECT number FROM orders 
-		WHERE status = ANY($1) 
-		ORDER BY uploaded_at 
+		SELECT number, user_id FROM orders
+		WHERE status = ANY($1)
+		ORDER BY uploaded_at
 		LIMIT 100;
 	`
 	statusStrings := make([]string, len(status))
@@ -80,19 +80,20 @@ func (r *Repo) GetOrderNumbersInStatus(ctx context.Context, status []models.Orde
 		return nil, fmt.Errorf("get order numbers: %w", err)
 	}
 	defer rows.Close()
-	var numbers []string
+
+	var orders []models.OrderUpdate
 	for rows.Next() {
-		var number string
-		if err = rows.Scan(&number); err != nil {
+		var order models.OrderUpdate
+		if err = rows.Scan(&order.Number, &order.UserID); err != nil {
 			return nil, fmt.Errorf("get order numbers: %w", err)
 		}
-		numbers = append(numbers, number)
+		orders = append(orders, order)
 	}
 
-	return numbers, nil
+	return orders, nil
 }
 
-func (r *Repo) UpdateOrders(ctx context.Context, orders []models.Order) error {
+func (r *Repo) UpdateOrders(ctx context.Context, orders []models.OrderUpdate) error {
 	query := `
 		UPDATE orders
 		SET status = $1, accrual = $2
