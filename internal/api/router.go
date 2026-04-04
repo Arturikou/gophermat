@@ -22,6 +22,9 @@ func (h *Handler) Router() chi.Router {
 				r.Get("/balance", h.GetBalance)
 				r.Post("/balance/withdraw", h.Withdraw)
 				r.Get("/withdrawals", h.GetBalance)
+
+				r.Post("/orders", h.Orders)
+				r.Get("/orders", h.GetOrders)
 			})
 		})
 	})

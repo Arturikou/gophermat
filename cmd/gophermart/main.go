@@ -44,12 +44,14 @@ func main() {
 	authService := service.NewAuthService(repo)
 	tokenManager := auth.NewManager(cfg.Auth.SecretKey)
 	balanceService := service.NewBalanceService(repo)
+	orderService := service.NewOrderService(repo)
 
 	handler := api.New(
 		log,
 		authService,
 		tokenManager,
 		balanceService,
+		orderService,
 	)
 
 	srv := http.Server{

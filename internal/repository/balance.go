@@ -68,10 +68,6 @@ func (r *Repo) GetWithdrawals(ctx context.Context, userID int) ([]models.Withdra
 
 	rows, err := r.query(ctx, query, userID)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return []models.Withdrawal{}, nil
-		}
-
 		return nil, fmt.Errorf("get user withdrawals: %w", err)
 	}
 	defer rows.Close()

@@ -24,11 +24,17 @@ type BalanceService interface {
 	GetWithdrawals(ctx context.Context, userID int) ([]models.Withdrawal, error)
 }
 
+type OrderService interface {
+	AddOrder(ctx context.Context, orderNumber string, userID int) error
+	GetUserOrders(ctx context.Context, userID int) ([]models.Order, error)
+}
+
 type Handler struct {
 	logger         *slog.Logger
 	authService    AuthService
 	tokenManager   TokenManager
 	balanceService BalanceService
+	orderService   OrderService
 	validate       *validator.Validate
 }
 
@@ -37,12 +43,14 @@ func New(
 	authService AuthService,
 	tokenManager TokenManager,
 	balanceService BalanceService,
+	orderService OrderService,
 ) *Handler {
 	return &Handler{
 		logger:         logger,
 		authService:    authService,
 		tokenManager:   tokenManager,
 		balanceService: balanceService,
+		orderService:   orderService,
 		validate:       validator.New(),
 	}
 }
