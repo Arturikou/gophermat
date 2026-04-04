@@ -13,3 +13,6 @@ db:
 auth:
   secret_key: "supersecretkey"
 
+accrual_system:
+  address: "http://localhost:8081"
+  timeout: 5s

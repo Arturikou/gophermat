@@ -10,11 +10,12 @@ import (
 )
 
 type Config struct {
-	Env        string           `yaml:"env" env-default:"local"`
-	LogLevel   string           `yaml:"log_level" env-default:"info"`
-	HTTPServer HTTPServerConfig `yaml:"http_server"`
-	DB         DBConfig         `yaml:"db"`
-	Auth       AuthConfig       `yaml:"auth"`
+	Env           string              `yaml:"env" env-default:"local"`
+	LogLevel      string              `yaml:"log_level" env-default:"info"`
+	HTTPServer    HTTPServerConfig    `yaml:"http_server"`
+	DB            DBConfig            `yaml:"db"`
+	Auth          AuthConfig          `yaml:"auth"`
+	AccrualSystem AccrualSystemConfig `yaml:"accrual_system"`
 }
 
 type AuthConfig struct {
@@ -36,9 +37,15 @@ type HTTPServerConfig struct {
 	WriteTimeout time.Duration `yaml:"write_timeout" env-default:"2s"`
 }
 
+type AccrualSystemConfig struct {
+	Address string        `yaml:"address" env:"ACCRUAL_SYSTEM_ADDRESS"`
+	Timeout time.Duration `yaml:"timeout" env-default:"5s"`
+}
+
 func MustLoad() *Config {
 	serverAddress := flag.String("a", "", "server address")
 	dbAddress := flag.String("d", "", "db address")
+	accrualSystemAddress := flag.String("r", "", "accrual system address")
 	flag.Parse()
 
 	configPath := os.Getenv("CONFIG_PATH")
@@ -58,8 +65,13 @@ func MustLoad() *Config {
 	if *serverAddress != "" {
 		cfg.HTTPServer.Address = *serverAddress
 	}
+
 	if *dbAddress != "" {
 		cfg.DB.DSN = *dbAddress
+	}
+
+	if *accrualSystemAddress != "" {
+		cfg.AccrualSystem.Address = *accrualSystemAddress
 	}
 
 	return &cfg
