@@ -21,7 +21,7 @@ func (h *Handler) Router() chi.Router {
 				r.Use(mw.Auth(h.tokenManager))
 				r.Get("/balance", h.GetBalance)
 				r.Post("/balance/withdraw", h.Withdraw)
-				r.Get("/withdrawals", h.GetBalance)
+				r.Get("/withdrawals", h.GetWithdrawals)
 
 				r.Post("/orders", h.Orders)
 				r.Get("/orders", h.GetOrders)

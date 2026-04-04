@@ -13,6 +13,7 @@ type OrderRepo interface {
 	GetOrdersByUserID(ctx context.Context, userID int) ([]models.Order, error)
 	GetOrdersInStatus(ctx context.Context, status []models.OrderStatus) ([]models.OrderUpdate, error)
 	UpdateOrders(ctx context.Context, orders []models.OrderUpdate) error
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 type OrderService struct {
@@ -57,4 +58,8 @@ func (s *OrderService) GetPendingOrders(ctx context.Context) ([]models.OrderUpda
 
 func (s *OrderService) UpdateOrders(ctx context.Context, orders []models.OrderUpdate) error {
 	return s.repo.UpdateOrders(ctx, orders)
+}
+
+func (s *OrderService) WithTx(ctx context.Context, fn func(ctx context.Context) error) error {
+	return s.repo.WithTx(ctx, fn)
 }

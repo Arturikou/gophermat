@@ -69,7 +69,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	if err = h.validate.Struct(req); err != nil {
 		h.logger.Debug("validation error", logger.Err(err))
-		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 

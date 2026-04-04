@@ -17,6 +17,7 @@ import (
 type OrderService interface {
 	GetPendingOrders(ctx context.Context) ([]models.OrderUpdate, error)
 	UpdateOrders(ctx context.Context, orders []models.OrderUpdate) error
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
 type BalanceService interface {
@@ -212,16 +213,22 @@ func (p *Processor) runFlusher(ctx context.Context) {
 }
 
 func (p *Processor) flush(ctx context.Context, orders []models.OrderUpdate) {
-	if err := p.orderService.UpdateOrders(ctx, orders); err != nil {
-		p.logger.Error("failed to update orders", logger.Err(err))
-		return
-	}
+	err := p.orderService.WithTx(ctx, func(ctx context.Context) error {
+		if err := p.orderService.UpdateOrders(ctx, orders); err != nil {
+			return err
+		}
 
-	for _, order := range orders {
-		if order.Status == models.OrderStatusProcessed && !order.Accrual.IsZero() {
-			if err := p.balanceService.UpdateUserBalance(ctx, order.UserID, order.Accrual); err != nil {
-				p.logger.Error("failed to update user balance", "order", order.Number, "user_id", order.UserID, logger.Err(err))
+		for _, order := range orders {
+			if order.Status == models.OrderStatusProcessed && !order.Accrual.IsZero() {
+				if err := p.balanceService.UpdateUserBalance(ctx, order.UserID, order.Accrual); err != nil {
+					return err
+				}
 			}
 		}
+
+		return nil
+	})
+	if err != nil {
+		p.logger.Error("failed to flush orders", logger.Err(err))
 	}
 }
