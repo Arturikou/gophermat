@@ -7,7 +7,6 @@ import (
 
 	"github.com/Arturikou/internal/models"
 	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/shopspring/decimal"
 )
@@ -46,6 +45,17 @@ func (r *Repo) AddWithdrawal(ctx context.Context, withdraw models.Withdrawal) er
 	return nil
 }
 
+func (r *Repo) CreateUserBalance(ctx context.Context, userID int) error {
+	query := `INSERT INTO bonus_balances (user_id) VALUES ($1)`
+
+	_, err := r.exec(ctx, query, userID)
+	if err != nil {
+		return fmt.Errorf("create user balance: %w", err)
+	}
+
+	return nil
+}
+
 func (r *Repo) GetUserBalance(ctx context.Context, userID int) (models.Balance, error) {
 	var balance models.Balance
 
@@ -53,10 +63,6 @@ func (r *Repo) GetUserBalance(ctx context.Context, userID int) (models.Balance, 
 
 	err := r.queryRow(ctx, query, userID).Scan(&balance.Current, &balance.Withdrawn)
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return models.Balance{}, nil
-		}
-
 		return models.Balance{}, fmt.Errorf("get user balance: %w", err)
 	}
 

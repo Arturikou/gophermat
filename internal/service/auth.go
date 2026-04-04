@@ -11,6 +11,8 @@ import (
 type AuthRepo interface {
 	AddUser(ctx context.Context, login string, password string) (int, error)
 	GetUserByLogin(ctx context.Context, login string) (models.User, error)
+	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
+	CreateUserBalance(ctx context.Context, userID int) error
 }
 
 type AuthService struct {
@@ -31,7 +33,20 @@ func (s *AuthService) Register(ctx context.Context, login string, password strin
 		return 0, fmt.Errorf("could not generate password: %w", err)
 	}
 
-	return s.repo.AddUser(ctx, login, hashedPassword)
+	var userID int
+	err = s.repo.WithTx(ctx, func(ctx context.Context) error {
+		var err error
+		userID, err = s.repo.AddUser(ctx, login, hashedPassword)
+		if err != nil {
+			return err
+		}
+		return s.repo.CreateUserBalance(ctx, userID)
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return userID, nil
 }
 
 func (s *AuthService) Login(ctx context.Context, login string, password string) (int, error) {
