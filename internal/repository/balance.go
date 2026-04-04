@@ -32,19 +32,6 @@ func (r *Repo) Withdraw(ctx context.Context, userID int, amount decimal.Decimal)
 	return nil
 }
 
-func (r *Repo) AddWithdrawal(ctx context.Context, withdraw models.Withdrawal) error {
-	query := `
-	INSERT INTO bonus_withdrawals (user_id, order_number, amount)
-	VALUES ($1, $2, $3)
-	`
-	_, err := r.exec(ctx, query, withdraw.UserID, withdraw.OrderNumber, withdraw.Amount)
-	if err != nil {
-		return fmt.Errorf("add withdrawal: %w", err)
-	}
-
-	return nil
-}
-
 func (r *Repo) CreateUserBalance(ctx context.Context, userID int) error {
 	query := `INSERT INTO bonus_balances (user_id) VALUES ($1)`
 
@@ -67,6 +54,33 @@ func (r *Repo) GetUserBalance(ctx context.Context, userID int) (models.Balance, 
 	}
 
 	return balance, nil
+}
+
+func (r *Repo) UpdateUserBalance(ctx context.Context, userID int, amount decimal.Decimal) error {
+	query := `
+		UPDATE bonus_balances 
+		SET current_amount=current_amount + $1 
+		WHERE user_id = $2
+		`
+	_, err := r.exec(ctx, query, amount, userID)
+	if err != nil {
+		return fmt.Errorf("update user balance: %w", err)
+	}
+
+	return nil
+}
+
+func (r *Repo) AddWithdrawal(ctx context.Context, withdraw models.Withdrawal) error {
+	query := `
+	INSERT INTO bonus_withdrawals (user_id, order_number, amount)
+	VALUES ($1, $2, $3)
+	`
+	_, err := r.exec(ctx, query, withdraw.UserID, withdraw.OrderNumber, withdraw.Amount)
+	if err != nil {
+		return fmt.Errorf("add withdrawal: %w", err)
+	}
+
+	return nil
 }
 
 func (r *Repo) GetWithdrawals(ctx context.Context, userID int) ([]models.Withdrawal, error) {

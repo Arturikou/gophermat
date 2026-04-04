@@ -15,6 +15,11 @@ const (
 	OrderStatusProcessed  OrderStatus = "PROCESSED"
 )
 
+var PendingOrderStatuses = []OrderStatus{
+	OrderStatusNew,
+	OrderStatusProcessing,
+}
+
 type Order struct {
 	Number     string
 	Status     OrderStatus

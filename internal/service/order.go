@@ -11,6 +11,8 @@ type OrderRepo interface {
 	AddOrder(ctx context.Context, orderNumber string, userID int) error
 	GetUserIDByOrderNumber(ctx context.Context, number string) (int, error)
 	GetOrdersByUserID(ctx context.Context, userID int) ([]models.Order, error)
+	GetOrderNumbersInStatus(ctx context.Context, status []models.OrderStatus) ([]string, error)
+	UpdateOrders(ctx context.Context, orders []models.Order) error
 }
 
 type OrderService struct {
@@ -47,4 +49,12 @@ func (s *OrderService) AddOrder(ctx context.Context, orderNumber string, userID 
 
 func (s *OrderService) GetUserOrders(ctx context.Context, userID int) ([]models.Order, error) {
 	return s.repo.GetOrdersByUserID(ctx, userID)
+}
+
+func (s *OrderService) GetPendingOrderNumbers(ctx context.Context) ([]string, error) {
+	return s.repo.GetOrderNumbersInStatus(ctx, models.PendingOrderStatuses)
+}
+
+func (s *OrderService) UpdateOrders(ctx context.Context, orders []models.Order) error {
+	return s.repo.UpdateOrders(ctx, orders)
 }

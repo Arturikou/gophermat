@@ -12,6 +12,7 @@ type querier interface {
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	SendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults
 }
 
 type txKey struct{}
@@ -41,4 +42,8 @@ func (r *Repo) queryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 
 func (r *Repo) query(ctx context.Context, sql string, args ...any) (pgx.Rows, error) {
 	return r.conn(ctx).Query(ctx, sql, args...)
+}
+
+func (r *Repo) sendBatch(ctx context.Context, b *pgx.Batch) pgx.BatchResults {
+	return r.conn(ctx).SendBatch(ctx, b)
 }

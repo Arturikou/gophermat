@@ -13,6 +13,7 @@ type BalanceRepo interface {
 	AddWithdrawal(ctx context.Context, withdrawal models.Withdrawal) error
 	GetUserBalance(ctx context.Context, userID int) (models.Balance, error)
 	GetWithdrawals(ctx context.Context, userID int) ([]models.Withdrawal, error)
+	UpdateUserBalance(ctx context.Context, userID int, amount decimal.Decimal) error
 }
 
 type BalanceService struct {
@@ -43,4 +44,8 @@ func (b *BalanceService) GetUserBalance(ctx context.Context, userID int) (models
 
 func (b *BalanceService) GetWithdrawals(ctx context.Context, userID int) ([]models.Withdrawal, error) {
 	return b.repo.GetWithdrawals(ctx, userID)
+}
+
+func (b *BalanceService) UpdateUserBalance(ctx context.Context, userID int, amount decimal.Decimal) error {
+	return b.repo.UpdateUserBalance(ctx, userID, amount)
 }

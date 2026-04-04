@@ -7,6 +7,7 @@ import (
 
 	"github.com/Arturikou/internal/models"
 	"github.com/jackc/pgerrcode"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -60,4 +61,57 @@ func (r *Repo) GetOrdersByUserID(ctx context.Context, userID int) ([]models.Orde
 	}
 
 	return orders, nil
+}
+
+func (r *Repo) GetOrderNumbersInStatus(ctx context.Context, status []models.OrderStatus) ([]string, error) {
+	query := `
+		SELECT number FROM orders 
+		WHERE status = ANY($1) 
+		ORDER BY uploaded_at 
+		LIMIT 100;
+	`
+	statusStrings := make([]string, len(status))
+	for i, s := range status {
+		statusStrings[i] = string(s)
+	}
+
+	rows, err := r.query(ctx, query, statusStrings)
+	if err != nil {
+		return nil, fmt.Errorf("get order numbers: %w", err)
+	}
+	defer rows.Close()
+	var numbers []string
+	for rows.Next() {
+		var number string
+		if err = rows.Scan(&number); err != nil {
+			return nil, fmt.Errorf("get order numbers: %w", err)
+		}
+		numbers = append(numbers, number)
+	}
+
+	return numbers, nil
+}
+
+func (r *Repo) UpdateOrders(ctx context.Context, orders []models.Order) error {
+	query := `
+		UPDATE orders
+		SET status = $1, accrual = $2
+		WHERE number = $3 AND (status IS DISTINCT FROM $1)
+	`
+
+	batch := &pgx.Batch{}
+	for _, order := range orders {
+		batch.Queue(query, order.Status, order.Accrual, order.Number)
+	}
+
+	br := r.sendBatch(ctx, batch)
+	defer br.Close()
+
+	for range orders {
+		if _, err := br.Exec(); err != nil {
+			return fmt.Errorf("update order: %w", err)
+		}
+	}
+
+	return nil
 }
