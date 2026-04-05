@@ -18,8 +18,17 @@ import (
 	"github.com/Arturikou/internal/storage/postgresql"
 	"github.com/Arturikou/internal/worker/accrual"
 	"github.com/Arturikou/migrations"
+
+	_ "github.com/Arturikou/docs"
 )
 
+// @title        Gophermart API
+// @version      1.0
+// @host         localhost:8080
+// @BasePath     /api
+// @securityDefinitions.apikey  BearerAuth
+// @in                          header
+// @name                        Authorization
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()

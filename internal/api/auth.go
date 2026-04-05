@@ -15,6 +15,17 @@ type UserReq struct {
 	Password string `json:"password" validate:"required,min=7"`
 }
 
+// Register godoc
+// @Summary      Регистрация пользователя
+// @Tags         auth
+// @Accept       json
+// @Param        input  body  UserReq  true  "Логин и пароль"
+// @Success      200  {string}  string  "JWT-токен в заголовке Authorization"
+// @Header       200  {string}  Authorization  "Bearer <token>"
+// @Failure      400  {string}  string  "Неверный формат запроса"
+// @Failure      409  {string}  string  "Логин уже занят"
+// @Failure      500  {string}  string  "Внутренняя ошибка сервера"
+// @Router       /user/register [post]
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -56,6 +67,17 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// Login godoc
+// @Summary      Аутентификация пользователя
+// @Tags         auth
+// @Accept       json
+// @Param        input  body  UserReq  true  "Логин и пароль"
+// @Success      200  {string}  string  "JWT-токен в заголовке Authorization"
+// @Header       200  {string}  Authorization  "Bearer <token>"
+// @Failure      400  {string}  string  "Неверный формат запроса"
+// @Failure      401  {string}  string  "Неверный логин или пароль"
+// @Failure      500  {string}  string  "Внутренняя ошибка сервера"
+// @Router       /user/login [post]
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 

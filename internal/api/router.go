@@ -4,6 +4,7 @@ import (
 	mw "github.com/Arturikou/internal/httpserver/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func (h *Handler) Router() chi.Router {
@@ -28,6 +29,7 @@ func (h *Handler) Router() chi.Router {
 			})
 		})
 	})
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	return r
 }

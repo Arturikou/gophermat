@@ -28,6 +28,18 @@ type WithdrawalResp struct {
 	ProcessedAt string  `json:"processed_at"`
 }
 
+// Withdraw godoc
+// @Summary      Списание средств
+// @Tags         balance
+// @Accept       json
+// @Param        input  body  WithdrawReq  true  "Номер заказа и сумма списания"
+// @Success      200  {string}  string  "Успешное списание"
+// @Failure      400  {string}  string  "Неверный формат запроса"
+// @Failure      402  {string}  string  "Недостаточно средств"
+// @Failure      422  {string}  string  "Неверный формат номера заказа"
+// @Failure      500  {string}  string  "Внутренняя ошибка сервера"
+// @Security     BearerAuth
+// @Router       /user/balance/withdraw [post]
 func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -78,6 +90,14 @@ func (h *Handler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// GetBalance godoc
+// @Summary      Получение текущего баланса
+// @Tags         balance
+// @Produce      json
+// @Success      200  {object}  BalanceResp  "Текущий баланс"
+// @Failure      500  {string}  string       "Внутренняя ошибка сервера"
+// @Security     BearerAuth
+// @Router       /user/balance [get]
 func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -106,6 +126,15 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetWithdrawals godoc
+// @Summary      Получение информации о выводе средств
+// @Tags         balance
+// @Produce      json
+// @Success      200  {array}   WithdrawalResp  "Список списаний"
+// @Success      204  {string}  string          "Списаний нет"
+// @Failure      500  {string}  string          "Внутренняя ошибка сервера"
+// @Security     BearerAuth
+// @Router       /user/withdrawals [get]
 func (h *Handler) GetWithdrawals(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

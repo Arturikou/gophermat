@@ -20,6 +20,19 @@ type OrderResp struct {
 	UploadedAt string   `json:"uploaded_at"`
 }
 
+// Orders godoc
+// @Summary      Загрузка номера заказа
+// @Tags         orders
+// @Accept       plain
+// @Param        number  body  string  true  "Номер заказа"
+// @Success      200  {string}  string  "Номер заказа уже был загружен этим пользователем"
+// @Success      202  {string}  string  "Номер заказа принят в обработку"
+// @Failure      400  {string}  string  "Неверный формат запроса"
+// @Failure      409  {string}  string  "Номер заказа уже загружен другим пользователем"
+// @Failure      422  {string}  string  "Неверный формат номера заказа"
+// @Failure      500  {string}  string  "Внутренняя ошибка сервера"
+// @Security     BearerAuth
+// @Router       /user/orders [post]
 func (h *Handler) Orders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -67,6 +80,15 @@ func (h *Handler) Orders(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
+// GetOrders godoc
+// @Summary      Получение списка загруженных номеров заказов
+// @Tags         orders
+// @Produce      json
+// @Success      200  {array}   OrderResp  "Список заказов"
+// @Success      204  {string}  string     "Заказов нет"
+// @Failure      500  {string}  string     "Внутренняя ошибка сервера"
+// @Security     BearerAuth
+// @Router       /user/orders [get]
 func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 

@@ -5,7 +5,7 @@ HTTP-сервис для учёта бонусных баллов пользов
 ## Стек
 
 - **Go 1.26**
-- **PostgreSQL** — ббаза данных
+- **PostgreSQL** — база данных
 - **chi** — HTTP-роутер
 - **pgx/v5** — драйвер PostgreSQL
 - **golang-migrate** — миграции БД
@@ -18,17 +18,17 @@ HTTP-сервис для учёта бонусных баллов пользов
 ```
 cmd/gophermart/
 internal/
-  api/                — HTTP-хэндлеры
-  service/            — бизнес-логика
-  repository/         — запросы к БД
-  models/             — доменные модели и ошибки
-  worker/accrual/     — фоновый обработчик начислений
-  clients/accrual-system/ — клиент внешнего сервиса(accrual)
-  auth/               — JWT
-  config/             — конфигурация
-  storage/postgresql/ — пул соединений, миграции
-migrations/           — SQL-миграции
-config/config.yaml    — конфигурация по умолчанию
+  api/                    — HTTP-хэндлеры
+  service/                — бизнес-логика
+  repository/             — запросы к БД
+  models/                 — доменные модели и ошибки
+  worker/accrual/         — фоновый обработчик начислений
+  clients/accrual-system/ — клиент внешнего сервиса accrual
+  auth/                   — JWT
+  config/                 — конфиг
+  storage/postgresql/     — коннект, запуск миграций
+migrations/               — SQL-миграции
+config/config.yaml        — конфигурация по умолчанию
 ```
 
 Accrual воркер работает по схеме pipeline:
@@ -36,7 +36,7 @@ Accrual воркер работает по схеме pipeline:
 
 ## Конфигурация
 
-Поддерживаются три способа (приоритет: флаг > переменная окружения > config.yaml):
+приоритет: флаг > переменная окружения > config.yaml
 
 | Параметр | Флаг | Переменная окружения | YAML-ключ |
 |---|---|---|---|
@@ -68,8 +68,8 @@ POST /api/user/register
 Content-Type: application/json
 
 {
-"login": "user", 
-"password": "secret"
+  "login": "user", 
+  "password": "secret"
 }
 ```
 
