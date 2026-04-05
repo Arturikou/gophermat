@@ -1,4 +1,4 @@
-package service
+package auth
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+//go:generate mockery --name=AuthRepo --filename=mock_auth_repo_test.go --inpackage --disable-version-string
 type AuthRepo interface {
 	AddUser(ctx context.Context, login string, password string) (int, error)
 	GetUserByLogin(ctx context.Context, login string) (models.User, error)

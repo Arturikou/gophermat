@@ -1,4 +1,4 @@
-package service
+package order
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/Arturikou/internal/models"
 )
 
+//go:generate mockery --name=OrderRepo --filename=mock_order_repo_test.go --inpackage --disable-version-string
 type OrderRepo interface {
 	AddOrder(ctx context.Context, orderNumber string, userID int) error
 	GetUserIDByOrderNumber(ctx context.Context, number string) (int, error)

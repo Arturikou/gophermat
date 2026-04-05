@@ -14,14 +14,21 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+//go:generate mockery --name=OrderService --filename=mock_order_service_test.go --inpackage --disable-version-string
 type OrderService interface {
 	GetPendingOrders(ctx context.Context) ([]models.OrderUpdate, error)
 	UpdateOrders(ctx context.Context, orders []models.OrderUpdate) error
 	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
+//go:generate mockery --name=BalanceService --filename=mock_balance_service_test.go --inpackage --disable-version-string
 type BalanceService interface {
 	UpdateUserBalance(ctx context.Context, userID int, amount decimal.Decimal) error
+}
+
+//go:generate mockery --name=Client --filename=mock_client_test.go --inpackage --disable-version-string
+type Client interface {
+	GetOrder(ctx context.Context, orderNumber string) (accrualsystem.OrderResponse, error)
 }
 
 const (
@@ -34,7 +41,7 @@ type Processor struct {
 	logger         *slog.Logger
 	orderService   OrderService
 	balanceService BalanceService
-	accrualClient  *accrualsystem.Client
+	accrualClient  Client
 	orderChan      chan models.OrderUpdate
 	processedChan  chan models.OrderUpdate
 	semaphore      chan struct{}
@@ -49,7 +56,7 @@ func NewProcessor(
 	workerCount,
 	maxConcurrency int,
 	orderService OrderService,
-	accrualClient *accrualsystem.Client,
+	accrualClient Client,
 	balanceService BalanceService,
 ) *Processor {
 	return &Processor{

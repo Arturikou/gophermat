@@ -14,7 +14,9 @@ import (
 	"github.com/Arturikou/internal/config"
 	"github.com/Arturikou/internal/logger"
 	"github.com/Arturikou/internal/repository"
-	"github.com/Arturikou/internal/service"
+	auth2 "github.com/Arturikou/internal/service/auth"
+	"github.com/Arturikou/internal/service/balance"
+	"github.com/Arturikou/internal/service/order"
 	"github.com/Arturikou/internal/storage/postgresql"
 	"github.com/Arturikou/internal/worker/accrual"
 	"github.com/Arturikou/migrations"
@@ -55,10 +57,10 @@ func main() {
 	defer pool.Close()
 
 	repo := repository.New(pool)
-	authService := service.NewAuthService(repo)
+	authService := auth2.NewAuthService(repo)
 	tokenManager := auth.NewManager(cfg.Auth.SecretKey)
-	balanceService := service.NewBalanceService(repo)
-	orderService := service.NewOrderService(repo)
+	balanceService := balance.NewBalanceService(repo)
+	orderService := order.NewOrderService(repo)
 	accrualClient := accrualsystem.New(cfg.AccrualSystem.Address, cfg.AccrualSystem.Timeout)
 
 	accrualProcessor := accrual.NewProcessor(

@@ -1,4 +1,4 @@
-package service
+package balance
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+//go:generate mockery --name=BalanceRepo --filename=mock_balance_repo_test.go --inpackage --disable-version-string
 type BalanceRepo interface {
 	WithTx(ctx context.Context, fn func(ctx context.Context) error) error
 	Withdraw(ctx context.Context, userID int, amount decimal.Decimal) error
