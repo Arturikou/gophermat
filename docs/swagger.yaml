@@ -1,0 +1,276 @@
+basePath: /api
+definitions:
+  api.BalanceResp:
+    properties:
+      current:
+        type: number
+      withdrawn:
+        type: number
+    type: object
+  api.OrderResp:
+    properties:
+      accrual:
+        type: number
+      number:
+        type: string
+      status:
+        type: string
+      uploaded_at:
+        type: string
+    type: object
+  api.UserReq:
+    properties:
+      login:
+        maxLength: 32
+        minLength: 3
+        type: string
+      password:
+        minLength: 7
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  api.WithdrawReq:
+    properties:
+      order:
+        type: string
+      sum:
+        type: number
+    required:
+    - order
+    type: object
+  api.WithdrawalResp:
+    properties:
+      order:
+        type: string
+      processed_at:
+        type: string
+      sum:
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Gophermart API
+  version: "1.0"
+paths:
+  /user/balance:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Текущий баланс
+          schema:
+            $ref: '#/definitions/api.BalanceResp'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Получение баланса
+      tags:
+      - balance
+  /user/balance/withdraw:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Номер заказа и сумма списания
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.WithdrawReq'
+      responses:
+        "200":
+          description: Успешное списание
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "402":
+          description: Недостаточно средств
+          schema:
+            type: string
+        "422":
+          description: Неверный формат номера заказа
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Списание баллов
+      tags:
+      - balance
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Логин и пароль
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      responses:
+        "200":
+          description: JWT-токен в заголовке Authorization
+          headers:
+            Authorization:
+              description: Bearer <token>
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "401":
+          description: Неверный логин или пароль
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Аутентификация пользователя
+      tags:
+      - auth
+  /user/orders:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список заказов
+          schema:
+            items:
+              $ref: '#/definitions/api.OrderResp'
+            type: array
+        "204":
+          description: Заказов нет
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Получение списка заказов
+      tags:
+      - orders
+    post:
+      consumes:
+      - text/plain
+      parameters:
+      - description: Номер заказа
+        in: body
+        name: number
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Заказ уже был загружен этим пользователем
+          schema:
+            type: string
+        "202":
+          description: Заказ принят в обработку
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "409":
+          description: Заказ уже загружен другим пользователем
+          schema:
+            type: string
+        "422":
+          description: Неверный формат номера заказа
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Загрузка номера заказа
+      tags:
+      - orders
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Логин и пароль
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/api.UserReq'
+      responses:
+        "200":
+          description: JWT-токен в заголовке Authorization
+          headers:
+            Authorization:
+              description: Bearer <token>
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Неверный формат запроса
+          schema:
+            type: string
+        "409":
+          description: Логин уже занят
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Регистрация пользователя
+      tags:
+      - auth
+  /user/withdrawals:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список списаний
+          schema:
+            items:
+              $ref: '#/definitions/api.WithdrawalResp'
+            type: array
+        "204":
+          description: Списаний нет
+          schema:
+            type: string
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: История списаний
+      tags:
+      - balance
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
