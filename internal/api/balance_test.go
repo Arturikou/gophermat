@@ -117,8 +117,8 @@ func TestHandler_GetBalance(t *testing.T) {
 		var resp BalanceResp
 		err := json.NewDecoder(w.Body).Decode(&resp)
 		assert.NoError(t, err)
-		assert.Equal(t, 500.5, resp.Current)
-		assert.Equal(t, 100.1, resp.Withdrawn)
+		assert.Equal(t, JSONDecimal{decimal.NewFromFloat(500.5)}, resp.Current)
+		assert.Equal(t, JSONDecimal{decimal.NewFromFloat(100.1)}, resp.Withdrawn)
 	})
 
 	t.Run("Internal Error", func(t *testing.T) {

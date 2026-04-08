@@ -18,14 +18,14 @@ type WithdrawReq struct {
 }
 
 type BalanceResp struct {
-	Current   float64 `json:"current"`
-	Withdrawn float64 `json:"withdrawn"`
+	Current   JSONDecimal `json:"current"`
+	Withdrawn JSONDecimal `json:"withdrawn"`
 }
 
 type WithdrawalResp struct {
-	OrderNumber string  `json:"order"`
-	Amount      float64 `json:"sum"`
-	ProcessedAt string  `json:"processed_at"`
+	OrderNumber string      `json:"order"`
+	Amount      JSONDecimal `json:"sum"`
+	ProcessedAt string      `json:"processed_at"`
 }
 
 // Withdraw godoc
@@ -114,8 +114,8 @@ func (h *Handler) GetBalance(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := BalanceResp{
-		Current:   balance.Current.InexactFloat64(),
-		Withdrawn: balance.Withdrawn.InexactFloat64(),
+		Current:   JSONDecimal{balance.Current},
+		Withdrawn: JSONDecimal{balance.Withdrawn},
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -159,7 +159,7 @@ func (h *Handler) GetWithdrawals(w http.ResponseWriter, r *http.Request) {
 	for _, withdrawal := range withdrawals {
 		resp = append(resp, WithdrawalResp{
 			OrderNumber: withdrawal.OrderNumber,
-			Amount:      withdrawal.Amount.InexactFloat64(),
+			Amount:      JSONDecimal{withdrawal.Amount},
 			ProcessedAt: withdrawal.ProcessedAt.Format(time.RFC3339),
 		})
 	}

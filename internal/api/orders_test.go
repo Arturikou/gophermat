@@ -144,7 +144,7 @@ func TestHandler_GetOrders(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, resp, 1)
 		assert.Equal(t, "12345678903", resp[0].Number)
-		assert.Equal(t, 500.5, *resp[0].Accrual)
+		assert.Equal(t, JSONDecimal{accrualValue}, *resp[0].Accrual)
 		assert.Equal(t, now.Format(time.RFC3339), resp[0].UploadedAt)
 		os.AssertExpectations(t)
 	})

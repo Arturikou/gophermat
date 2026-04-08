@@ -14,10 +14,10 @@ import (
 )
 
 type OrderResp struct {
-	Number     string   `json:"number"`
-	Status     string   `json:"status"`
-	Accrual    *float64 `json:"accrual,omitempty"`
-	UploadedAt string   `json:"uploaded_at"`
+	Number     string       `json:"number"`
+	Status     string       `json:"status"`
+	Accrual    *JSONDecimal `json:"accrual,omitempty"`
+	UploadedAt string       `json:"uploaded_at"`
 }
 
 // Orders godoc
@@ -117,7 +117,7 @@ func (h *Handler) GetOrders(w http.ResponseWriter, r *http.Request) {
 			UploadedAt: order.UploadedAt.Format(time.RFC3339),
 		}
 		if !order.Accrual.IsZero() {
-			accrual := order.Accrual.InexactFloat64()
+			accrual := JSONDecimal{order.Accrual}
 			resp.Accrual = &accrual
 		}
 		ordersResp = append(ordersResp, resp)

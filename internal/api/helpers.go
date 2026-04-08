@@ -6,7 +6,17 @@ import (
 
 	"github.com/Arturikou/internal/ctxkeys"
 	"github.com/Arturikou/internal/logger"
+	"github.com/shopspring/decimal"
 )
+
+// JSONDecimal wrap decimal.Decimal to marshal as JSON number
+type JSONDecimal struct {
+	decimal.Decimal
+}
+
+func (d JSONDecimal) MarshalJSON() ([]byte, error) {
+	return []byte(d.String()), nil
+}
 
 func (h *Handler) userIDFromCtx(ctx context.Context, w http.ResponseWriter) (int, bool) {
 	userID, err := ctxkeys.UserIDFromContext(ctx)

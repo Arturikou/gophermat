@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"iter"
 	"log/slog"
 	"sync"
 	"time"
@@ -96,18 +97,28 @@ func (p *Processor) runGenerator(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			orders, err := p.orderService.GetPendingOrders(ctx)
-			if err != nil {
-				p.logger.Error("failed to get pending orders", logger.Err(err))
-				continue
-			}
-
-			for _, order := range orders {
+			for order := range p.pendingOrders(ctx) {
 				select {
 				case p.orderChan <- order:
 				case <-ctx.Done():
 					return
 				}
+			}
+		}
+	}
+}
+
+func (p *Processor) pendingOrders(ctx context.Context) iter.Seq[models.OrderUpdate] {
+	return func(yield func(models.OrderUpdate) bool) {
+		orders, err := p.orderService.GetPendingOrders(ctx)
+		if err != nil {
+			p.logger.Error("failed to get pending orders", logger.Err(err))
+			return
+		}
+
+		for _, order := range orders {
+			if !yield(order) {
+				return
 			}
 		}
 	}
